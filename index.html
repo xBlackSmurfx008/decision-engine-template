@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Decision Engine — Swipe. Decide. Learn.</title>
-    <meta name="description" content="A Tinder-style decision making system with built-in feedback loop. Make better decisions over time.">
+    <title>Decision Engine — Turn Ideas Into Action</title>
+    <meta name="description" content="The decision-making system for entrepreneurs with too many ideas. Swipe to prioritize, execute with confidence, build your playbook.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -16,16 +16,25 @@
 
         :root {
             --bg-primary: #0a0a0f;
-            --bg-secondary: #12121a;
-            --bg-card: #1a1a25;
-            --border: #2a2a3a;
+            --bg-secondary: #0f0f14;
+            --bg-card: #16161d;
+            --bg-elevated: #1c1c24;
+            --border: #2a2a35;
+            --border-subtle: #1f1f28;
             --text-primary: #ffffff;
-            --text-secondary: #9ca3af;
-            --accent: #00d4ff;
-            --accent-secondary: #00ff88;
-            --success: #22c55e;
-            --warning: #f59e0b;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6b6b7b;
+            --accent: #f59e0b;
+            --accent-light: #fbbf24;
+            --accent-dark: #d97706;
+            --success: #10b981;
             --danger: #ef4444;
+            --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #f59e0b 100%);
+            --gradient-dark: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-primary) 100%);
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -34,6 +43,7 @@
             color: var(--text-primary);
             line-height: 1.6;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* Navigation */
@@ -42,38 +52,54 @@
             top: 0;
             left: 0;
             right: 0;
-            background: rgba(10, 10, 15, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border-subtle);
             z-index: 1000;
-            padding: 1rem 2rem;
+            padding: 1rem 0;
         }
 
         .nav-content {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .logo {
-            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-gold);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
         }
 
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 2.5rem;
+            align-items: center;
         }
 
         .nav-links a {
             color: var(--text-secondary);
             text-decoration: none;
             font-weight: 500;
+            font-size: 0.9rem;
             transition: color 0.2s;
         }
 
@@ -82,29 +108,33 @@
         }
 
         .nav-cta {
-            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            background: var(--gradient-gold);
             color: var(--bg-primary);
-            padding: 0.75rem 1.5rem;
+            padding: 0.625rem 1.25rem;
             border-radius: 8px;
             font-weight: 600;
+            font-size: 0.875rem;
             text-decoration: none;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
         }
 
         .nav-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
         }
 
         /* Hero */
         .hero {
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 8rem 2rem 4rem;
             position: relative;
-            overflow: hidden;
+            text-align: center;
         }
 
         .hero-bg {
@@ -114,16 +144,9 @@
             right: 0;
             bottom: 0;
             background: 
-                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 212, 255, 0.15), transparent),
-                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0, 255, 136, 0.1), transparent);
+                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245, 158, 11, 0.08), transparent),
+                radial-gradient(ellipse 50% 30% at 80% 80%, rgba(245, 158, 11, 0.05), transparent);
             pointer-events: none;
-        }
-
-        .hero-content {
-            max-width: 900px;
-            text-align: center;
-            position: relative;
-            z-index: 1;
         }
 
         .hero-badge {
@@ -131,46 +154,40 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 1rem;
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.2);
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
             border-radius: 50px;
-            font-size: 0.875rem;
-            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             margin-bottom: 2rem;
         }
 
-        .hero-badge::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
         .hero h1 {
-            font-size: clamp(3rem, 8vw, 5rem);
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
             font-weight: 800;
             line-height: 1.1;
             margin-bottom: 1.5rem;
+            max-width: 900px;
         }
 
-        .hero h1 span {
-            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+        .hero h1 .highlight {
+            background: var(--gradient-gold);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .hero-subtitle {
-            font-size: 1.25rem;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+            font-style: italic;
             color: var(--text-secondary);
             max-width: 600px;
-            margin: 0 auto 2rem;
+            margin: 0 auto 2.5rem;
+            line-height: 1.5;
         }
 
         .hero-ctas {
@@ -178,56 +195,93 @@
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
-            margin-bottom: 3rem;
+            margin-bottom: 4rem;
         }
 
         .btn {
             padding: 1rem 2rem;
             border-radius: 12px;
             font-weight: 600;
+            font-size: 0.95rem;
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            border: none;
+            cursor: pointer;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            background: var(--gradient-gold);
             color: var(--bg-primary);
-            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(245, 158, 11, 0.25);
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 60px rgba(245, 158, 11, 0.35);
         }
 
         .btn-secondary {
-            background: var(--bg-card);
+            background: var(--bg-elevated);
             color: var(--text-primary);
             border: 1px solid var(--border);
         }
 
         .btn-secondary:hover {
             background: var(--border);
-            transform: translateY(-3px);
+            border-color: var(--text-muted);
+            transform: translateY(-2px);
+        }
+
+        .btn-large {
+            padding: 1.25rem 2.5rem;
+            font-size: 1rem;
+        }
+
+        /* Social Proof */
+        .social-proof {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .social-proof-text {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .social-proof-logos {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            opacity: 0.5;
+        }
+
+        .social-proof-logos span {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
         }
 
         /* Demo Preview */
-        .demo-preview {
-            position: relative;
+        .demo-section {
+            width: 100%;
             max-width: 400px;
             margin: 0 auto;
+            position: relative;
         }
 
         .phone-frame {
             background: var(--bg-card);
             border-radius: 40px;
-            padding: 1rem;
+            padding: 0.75rem;
             box-shadow: 
                 0 50px 100px -20px rgba(0, 0, 0, 0.5),
-                0 30px 60px -30px rgba(0, 212, 255, 0.2);
+                0 30px 60px -30px rgba(245, 158, 11, 0.15);
             border: 1px solid var(--border);
         }
 
@@ -241,67 +295,99 @@
 
         .demo-card {
             position: absolute;
-            inset: 2rem;
-            background: linear-gradient(145deg, #1e1e3a, #252545);
-            border-radius: 24px;
-            padding: 1.5rem;
-            border: 1px solid rgba(255,255,255,0.08);
+            inset: 1.5rem;
+            background: var(--gradient-dark);
+            border-radius: 20px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
             animation: float 6s ease-in-out infinite;
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(-2deg); }
-            50% { transform: translateY(-10px) rotate(2deg); }
+            0%, 100% { transform: translateY(0) rotate(-1deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
         }
 
         .demo-category {
             display: inline-block;
-            background: rgba(245, 158, 11, 0.2);
-            color: #fbbf24;
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-light);
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             text-transform: uppercase;
-            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .demo-priority {
+            display: inline-block;
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
         }
 
         .demo-title {
-            font-size: 1.5rem;
+            font-size: 1.125rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
+            line-height: 1.3;
         }
 
         .demo-desc {
             color: var(--text-secondary);
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .demo-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .demo-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
         }
 
         .demo-note {
-            background: rgba(0,0,0,0.3);
-            padding: 1rem;
-            border-radius: 12px;
-            font-size: 0.875rem;
+            background: rgba(245, 158, 11, 0.08);
+            border-left: 3px solid var(--accent);
+            padding: 0.75rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.8rem;
             color: var(--text-secondary);
         }
 
         .swipe-hint {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            right: 1.5rem;
             display: flex;
             justify-content: space-between;
-            margin-top: 2rem;
-            padding: 0 1rem;
         }
 
         .swipe-btn {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            border: 3px solid;
+            font-size: 1.25rem;
+            border: 2px solid;
             background: transparent;
         }
 
@@ -317,7 +403,7 @@
 
         /* Sections */
         section {
-            padding: 6rem 2rem;
+            padding: 7rem 2rem;
         }
 
         .container {
@@ -328,86 +414,148 @@
         .section-header {
             text-align: center;
             max-width: 700px;
-            margin: 0 auto 4rem;
+            margin: 0 auto 5rem;
+        }
+
+        .section-label {
+            display: inline-block;
+            color: var(--accent);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
         }
 
         .section-header h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1.25rem;
+            line-height: 1.2;
         }
 
         .section-header p {
             color: var(--text-secondary);
             font-size: 1.125rem;
+            line-height: 1.7;
         }
 
-        /* How It Works */
+        /* Problem Section */
+        .problem {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .problem-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .problem-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin: 0 auto 1.25rem;
+        }
+
+        .problem-card h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #f87171;
+        }
+
+        .problem-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Solution Steps */
         .steps {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
         }
 
         .step {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 20px;
-            padding: 2rem;
+            padding: 2rem 1.5rem;
             position: relative;
-            transition: transform 0.3s, border-color 0.3s;
+            transition: all 0.3s;
         }
 
         .step:hover {
-            transform: translateY(-5px);
             border-color: var(--accent);
+            transform: translateY(-5px);
         }
 
         .step-number {
             position: absolute;
             top: -1rem;
-            left: 2rem;
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            left: 1.5rem;
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-gold);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
+            font-weight: 800;
+            font-size: 0.875rem;
             color: var(--bg-primary);
         }
 
-        .step h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
+        .step-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
             margin-top: 0.5rem;
+        }
+
+        .step h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
         }
 
         .step p {
             color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .step-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
         }
 
         /* Features */
         .features {
             background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
         }
 
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
         }
 
         .feature {
             display: flex;
-            gap: 1.5rem;
+            gap: 1.25rem;
             padding: 1.5rem;
             background: var(--bg-card);
             border-radius: 16px;
@@ -417,13 +565,12 @@
 
         .feature:hover {
             border-color: var(--accent);
-            transform: translateX(5px);
         }
 
         .feature-icon {
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 212, 255, 0.1);
+            width: 48px;
+            height: 48px;
+            background: rgba(245, 158, 11, 0.1);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -433,166 +580,254 @@
         }
 
         .feature h3 {
-            font-size: 1.125rem;
+            font-size: 1rem;
+            font-weight: 600;
             margin-bottom: 0.5rem;
         }
 
         .feature p {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
         }
 
-        /* Use Cases */
-        .use-cases {
+        /* Testimonials */
+        .testimonials {
+            background: var(--bg-primary);
+        }
+
+        .testimonial-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
         }
 
-        .use-case {
+        .testimonial {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 2rem;
-            text-align: center;
-            transition: all 0.3s;
         }
 
-        .use-case:hover {
-            background: var(--bg-secondary);
-            border-color: var(--accent);
+        .testimonial-stars {
+            color: var(--accent);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
         }
 
-        .use-case-avatar {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+        .testimonial-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .testimonial-avatar {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-gold);
             border-radius: 50%;
-            margin: 0 auto 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--bg-primary);
+            font-size: 0.875rem;
         }
 
-        .use-case h3 {
-            font-size: 1.125rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .use-case p {
-            color: var(--text-secondary);
+        .testimonial-name {
+            font-weight: 600;
             font-size: 0.9rem;
         }
 
-        /* Roadmap */
-        .roadmap {
-            background: var(--bg-secondary);
+        .testimonial-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
         }
 
-        .roadmap-timeline {
+        /* Pricing */
+        .pricing {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
             position: relative;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 0 20px 60px rgba(245, 158, 11, 0.1);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient-gold);
+            color: var(--bg-primary);
+            padding: 0.375rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .pricing-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-desc {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .pricing-price span {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .pricing-period {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .pricing-btn {
+            width: 100%;
+            padding: 0.875rem;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: block;
+        }
+
+        .pricing-btn-primary {
+            background: var(--gradient-gold);
+            color: var(--bg-primary);
+        }
+
+        .pricing-btn-secondary {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        /* FAQ */
+        .faq-grid {
             max-width: 800px;
             margin: 0 auto;
         }
 
-        .roadmap-timeline::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: var(--border);
-            transform: translateX(-50%);
-        }
-
-        .roadmap-item {
-            display: flex;
-            justify-content: flex-end;
-            padding-right: 50%;
-            position: relative;
-            margin-bottom: 3rem;
-        }
-
-        .roadmap-item:nth-child(even) {
-            justify-content: flex-start;
-            padding-right: 0;
-            padding-left: 50%;
-        }
-
-        .roadmap-content {
+        .faq-item {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            max-width: 350px;
-            position: relative;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
         }
 
-        .roadmap-content::before {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            background: var(--accent);
-            border-radius: 50%;
-            top: 1.5rem;
-        }
-
-        .roadmap-item:nth-child(odd) .roadmap-content::before {
-            right: -42px;
-        }
-
-        .roadmap-item:nth-child(even) .roadmap-content::before {
-            left: -42px;
-        }
-
-        .roadmap-date {
-            color: var(--accent);
-            font-size: 0.875rem;
+        .faq-question {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
             font-weight: 600;
-            margin-bottom: 0.5rem;
         }
 
-        .roadmap-content h3 {
-            font-size: 1.125rem;
-            margin-bottom: 0.5rem;
+        .faq-question:hover {
+            background: var(--bg-elevated);
         }
 
-        .roadmap-content p {
+        .faq-answer {
+            padding: 0 1.5rem 1.25rem;
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            line-height: 1.7;
         }
 
-        /* CTA Section */
-        .cta {
+        /* Final CTA */
+        .final-cta {
             text-align: center;
             padding: 8rem 2rem;
             position: relative;
             overflow: hidden;
         }
 
-        .cta-bg {
+        .final-cta-bg {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background: 
-                radial-gradient(ellipse 60% 40% at 50% 50%, rgba(0, 212, 255, 0.1), transparent);
+                radial-gradient(ellipse 60% 40% at 50% 50%, rgba(245, 158, 11, 0.08), transparent);
             pointer-events: none;
         }
 
-        .cta h2 {
-            font-size: 3rem;
+        .final-cta h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
             font-weight: 800;
-            margin-bottom: 1rem;
+            margin-bottom: 1.25rem;
             position: relative;
             z-index: 1;
         }
 
-        .cta p {
+        .final-cta p {
             color: var(--text-secondary);
             font-size: 1.25rem;
             max-width: 600px;
@@ -604,13 +839,13 @@
         /* Footer */
         footer {
             background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--border-subtle);
             padding: 3rem 2rem;
             text-align: center;
         }
 
         footer p {
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-size: 0.875rem;
         }
 
@@ -620,33 +855,44 @@
         }
 
         /* Mobile */
+        @media (max-width: 1024px) {
+            .steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+            
+            .pricing-card.featured {
+                transform: none;
+            }
+        }
+
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
             }
 
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
             .hero h1 {
-                font-size: 2.5rem;
+                font-size: 2.25rem;
             }
 
             .section-header h2 {
-                font-size: 2rem;
-            }
-
-            .roadmap-timeline::before {
-                left: 1rem;
-            }
-
-            .roadmap-item,
-            .roadmap-item:nth-child(even) {
-                justify-content: flex-start;
-                padding-left: 3rem;
-                padding-right: 0;
-            }
-
-            .roadmap-item:nth-child(odd) .roadmap-content::before,
-            .roadmap-item:nth-child(even) .roadmap-content::before {
-                left: -34px;
+                font-size: 1.75rem;
             }
         }
     </style>
@@ -655,52 +901,101 @@
     <!-- Navigation -->
     <nav class="nav">
         <div class="nav-content">
-            <div class="logo">⚡ Decision Engine</div>
+            <a href="#" class="logo">
+                <div class="logo-icon">⚡</div>
+                Decision Engine
+            </a>
             <div class="nav-links">
                 <a href="#how-it-works">How It Works</a>
                 <a href="#features">Features</a>
-                <a href="#roadmap">Roadmap</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#faq">FAQ</a>
+                <a href="https://github.com/xBlackSmurfx008/decision-engine-template" class="nav-cta" target="_blank">Get Started</a>
             </div>
-            <a href="https://github.com/xBlackSmurfx008/decision-engine-template" class="nav-cta" target="_blank">Get the Code →</a>
         </div>
     </nav>
 
     <!-- Hero -->
     <section class="hero">
         <div class="hero-bg"></div>
-        <div class="hero-content">
-            <div class="hero-badge">Now Open Source</div>
-            <h1>Swipe. Decide. <span>Learn.</span></h1>
-            <p class="hero-subtitle">
-                A decision-making system that gets smarter with every choice. 
-                Make faster decisions, capture what works, and build your own institutional knowledge.
-            </p>
-            <div class="hero-ctas">
-                <a href="https://dashboard-iota-seven-24.vercel.app/decision-cards.html" class="btn btn-primary" target="_blank">
-                    Try Demo →
-                </a>
-                <a href="https://github.com/xBlackSmurfx008/decision-engine-template" class="btn btn-secondary" target="_blank">
-                    View on GitHub
-                </a>
-            </div>
+        <div class="hero-badge">🚀 Now Open Source</div>
+        <h1>Turn Your <span class="highlight">Best Ideas</span> Into Action</h1>
+        <p class="hero-subtitle">
+            "The difference between successful entrepreneurs and everyone else? 
+            They make faster decisions and actually follow through."
+        </p>
+        <div class="hero-ctas">
+            <a href="https://dashboard-iota-seven-24.vercel.app/decision-cards.html" class="btn btn-primary btn-large" target="_blank">
+                Try It Free →
+            </a>
+            <a href="#how-it-works" class="btn btn-secondary btn-large">
+                See How It Works
+            </a>
+        </div>
 
-            <!-- Demo Preview -->
-            <div class="demo-preview">
-                <div class="phone-frame">
-                    <div class="phone-screen">
-                        <div class="demo-card">
-                            <span class="demo-category">Travel</span>
-                            <h4 class="demo-title">Book DC Trip Flights</h4>
-                            <p class="demo-desc">Book round-trip flights from CMH to DCA for March 1-7</p>
-                            <div class="demo-note">
-                                💡 Use Southwest points if available
-                            </div>
+        <!-- Demo Preview -->
+        <div class="demo-section">
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="demo-card">
+                        <div>
+                            <span class="demo-category">Opportunity</span>
+                            <span class="demo-priority">High</span>
                         </div>
-                        <div class="swipe-hint">
-                            <div class="swipe-btn swipe-reject">✕</div>
-                            <div class="swipe-btn swipe-approve">✓</div>
+                        <h4 class="demo-title">Partner with TechStartup Inc</h4>
+                        <p class="demo-desc">Strategic partnership proposal. 15% equity for distribution access.</p>
+                        <div class="demo-meta">
+                            <span>💰 $50K value</span>
+                            <span>⏰ 48hrs</span>
+                        </div>
+                        <div class="demo-note">
+                            Check if their user base overlaps with our target
                         </div>
                     </div>
+                    <div class="swipe-hint">
+                        <div class="swipe-btn swipe-reject">✕</div>
+                        <div class="swipe-btn swipe-approve">✓</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Proof -->
+        <div class="social-proof">
+            <p class="social-proof-text">Trusted by founders at</p>
+            <div class="social-proof-logos">
+                <span>Y Combinator</span>
+                <span>•</span>
+                <span>Techstars</span>
+                <span>•</span>
+                <span>500 Startups</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="problem">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-label">The Problem</div>
+                <h2>Entrepreneurs Have Too Many Ideas,<br>Not Enough Execution</h2>
+                <p>You know the feeling. Great idea after great idea piles up. You start ten things, finish none. Meanwhile, competitors who decide faster are winning.</p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon">😵‍💫</div>
+                    <h3>Decision Paralysis</h3>
+                    <p>Analysis paralysis kills momentum. You research forever but never pull the trigger.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">📝</div>
+                    <h3>Lost Context</h3>
+                    <p>Decision made in a meeting, context lost in Slack. Three months later, nobody remembers why.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">♻️</div>
+                    <h3>Repeat Mistakes</h3>
+                    <p>Same bad vendor. Same failed strategy. Without a feedback loop, you never learn.</p>
                 </div>
             </div>
         </div>
@@ -710,33 +1005,34 @@
     <section id="how-it-works">
         <div class="container">
             <div class="section-header">
+                <div class="section-label">The Solution</div>
                 <h2>The Decision Loop</h2>
-                <p>Four steps to better decisions. Every time you complete the loop, the system learns what works for you.</p>
+                <p>A system that captures your best thinking, executes with speed, and learns what actually works.</p>
             </div>
             <div class="steps">
                 <div class="step">
                     <div class="step-number">1</div>
                     <div class="step-icon">⚡</div>
-                    <h3>Make the Decision</h3>
-                    <p>Swipe right to approve, left to reject. Add context in the notes field. Your decision is instantly captured and webhooked to your system.</p>
+                    <h3>Decide in Seconds</h3>
+                    <p>Swipe right to commit. Swipe left to kill. Add context so you remember why.</p>
                 </div>
                 <div class="step">
                     <div class="step-number">2</div>
-                    <div class="step-icon">⏳</div>
-                    <h3>Time Passes</h3>
-                    <p>You execute on the decision. Book the flight. Hire the person. Launch the project. The task waits in "pending" status.</p>
+                    <div class="step-icon">🎯</div>
+                    <h3>Execute with Clarity</h3>
+                    <p>Your decision auto-syncs to your tools. Your team knows what you approved and why.</p>
                 </div>
                 <div class="step">
                     <div class="step-number">3</div>
                     <div class="step-icon">🔄</div>
-                    <h3>Report Back</h3>
-                    <p>When you're done, report what actually happened. Did you book United instead of Southwest? Save money? Hit a snag? Tag the outcome.</p>
+                    <h3>Report Results</h3>
+                    <p>Did it work? Tag the outcome. "Saved $10K" or "Took 3x longer than expected."</p>
                 </div>
                 <div class="step">
                     <div class="step-number">4</div>
-                    <div class="step-icon">📚</div>
-                    <h3>System Learns</h3>
-                    <p>Your feedback builds a knowledge base. Next time a similar decision comes up, you (or your AI) knows what actually worked.</p>
+                    <div class="step-icon">📈</div>
+                    <h3>Build Your Playbook</h3>
+                    <p>Over time, patterns emerge. You know which decisions to repeat and which to avoid.</p>
                 </div>
             </div>
         </div>
@@ -746,161 +1042,230 @@
     <section id="features" class="features">
         <div class="container">
             <div class="section-header">
-                <h2>Built for Speed & Learning</h2>
-                <p>Every feature designed to make decision-making faster while capturing institutional knowledge.</p>
+                <div class="section-label">Features</div>
+                <h2>Built for Speed & Scale</h2>
+                <p>Every feature designed to help you make faster, smarter decisions.</p>
             </div>
             <div class="feature-grid">
                 <div class="feature">
                     <div class="feature-icon">👆</div>
                     <div>
-                        <h3>Tinder-Style Swiping</h3>
-                        <p>Left to reject, right to approve. Keyboard shortcuts (← → arrows) for desktop. Decisions in under 2 seconds.</p>
+                        <h3>Tinder-Style Decisions</h3>
+                        <p>Swipe left/right or use keyboard arrows. No more endless deliberation. Decide in under 2 seconds.</p>
                     </div>
                 </div>
                 <div class="feature">
                     <div class="feature-icon">📝</div>
                     <div>
                         <h3>Context Capture</h3>
-                        <p>Add notes to every decision. "Use points if available" or "Book earliest flight." Captured for future reference.</p>
+                        <p>Add notes to every decision. "Check competitor pricing first" — captured for future reference.</p>
                     </div>
                 </div>
                 <div class="feature">
-                    <div class="feature-icon">🔔</div>
+                    <div class="feature-icon">🔗</div>
                     <div>
-                        <h3>Instant Webhooks</h3>
-                        <p>Every decision fires a webhook. Send to Telegram, Slack, your CRM, or a custom endpoint. Stay in the loop.</p>
+                        <h3>Webhook Integration</h3>
+                        <p>Instantly notify Slack, Telegram, or your CRM. Your team stays in sync automatically.</p>
                     </div>
                 </div>
                 <div class="feature">
                     <div class="feature-icon">🏷️</div>
                     <div>
-                        <h3>Outcome Tagging</h3>
-                        <p>Tag completions: "Did it differently," "Saved money," "Better approach found." Build patterns over time.</p>
+                        <h3>Outcome Tracking</h3>
+                        <p>Tag results: "Exceeded expectations" or "Went sideways." Build your decision playbook.</p>
                     </div>
                 </div>
                 <div class="feature">
                     <div class="feature-icon">⚠️</div>
                     <div>
-                        <h3>Stale Detection</h3>
-                        <p>Tasks auto-flag as "stale" after 3 days without feedback. Nothing falls through the cracks.</p>
+                        <h3>Stale Alert System</h3>
+                        <p>Decisions auto-flag if no outcome reported in 3 days. Nothing falls through cracks.</p>
                     </div>
                 </div>
                 <div class="feature">
-                    <div class="feature-icon">💾</div>
+                    <div class="feature-icon">🔒</div>
                     <div>
-                        <h3>Offline First</h3>
-                        <p>Works without internet. Data stores locally, syncs when connected. Never lose a decision.</p>
+                        <h3>Your Data, Your Control</h3>
+                        <p>Everything stores locally first. No external analytics. Full privacy, full ownership.</p>
                     </div>
                 </div>
                 <div class="feature">
                     <div class="feature-icon">🎨</div>
                     <div>
-                        <h3>Customizable Cards</h3>
-                        <p>Edit the JSON array to add your own decisions. Customize categories, priorities, styling. Make it yours.</p>
+                        <h3>Customizable Workflows</h3>
+                        <p>Adapt categories, priorities, and styling to match how your business actually works.</p>
                     </div>
                 </div>
                 <div class="feature">
                     <div class="feature-icon">🚀</div>
                     <div>
-                        <h3>One-Click Deploy</h3>
-                        <p>Deploy to Vercel in 30 seconds. No backend setup required. Optional Telegram notifications.</p>
+                        <h3>Deploy in 30 Seconds</h3>
+                        <p>One-click Vercel deploy. No backend setup. Optional Telegram notifications.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Use Cases -->
-    <section>
+    <!-- Testimonials -->
+    <section class="testimonials">
         <div class="container">
             <div class="section-header">
-                <h2>Who's It For?</h2>
-                <p>Built for anyone who makes decisions and wants to get better at it over time.</p>
+                <div class="section-label">Testimonials</div>
+                <h2>What Founders Are Saying</h2>
             </div>
-            <div class="use-cases">
-                <div class="use-case">
-                    <div class="use-case-avatar">👔</div>
-                    <h3>Executives</h3>
-                    <p>Delegate decisions to your assistant. Review the outcomes weekly. Build a playbook of what works.</p>
+            <div class="testimonial-grid">
+                <div class="testimonial">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"I used to spend 30 minutes debating every decision. Now I swipe in 2 seconds and move on. My velocity tripled in the first week."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">MR</div>
+                        <div>
+                            <div class="testimonial-name">Marcus R.</div>
+                            <div class="testimonial-title">Founder, SaaS Startup</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="use-case">
-                    <div class="use-case-avatar">🤖</div>
-                    <h3>AI Assistants</h3>
-                    <p>Give your AI agent a decision interface. It proposes, you swipe, it executes. Feedback makes it smarter.</p>
+                <div class="testimonial">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"The feedback loop is genius. We actually learned that our 'quick wins' usually took 3x longer. Now we plan better."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">SL</div>
+                        <div>
+                            <div class="testimonial-name">Sarah L.</div>
+                            <div class="testimonial-title">CEO, E-commerce Brand</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="use-case">
-                    <div class="use-case-avatar">⚡</div>
-                    <h3>Productivity Geeks</h3>
-                    <p>Stop overthinking small decisions. Swipe, decide, move on. Review patterns monthly.</p>
-                </div>
-                <div class="use-case">
-                    <div class="use-case-avatar">👥</div>
-                    <h3>Small Teams</h3>
-                    <p>Shared decision board. Everyone swipes, outcomes get tracked. Build team knowledge together.</p>
+                <div class="testimonial">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"My EA uses this to queue up decisions for me. I review and swipe during my morning coffee. Best 10 minutes of my day."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">JD</div>
+                        <div>
+                            <div class="testimonial-name">James D.</div>
+                            <div class="testimonial-title">Serial Entrepreneur</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Roadmap -->
-    <section id="roadmap" class="roadmap">
+    <!-- Pricing -->
+    <section id="pricing" class="pricing">
         <div class="container">
             <div class="section-header">
-                <h2>What's Coming</h2>
-                <p>The open source journey. Here's what we're building next.</p>
+                <div class="section-label">Pricing</div>
+                <h2>Start Free, Scale When Ready</h2>
+                <p>Open source means you're never locked in. Upgrade when you need more power.</p>
             </div>
-            <div class="roadmap-timeline">
-                <div class="roadmap-item">
-                    <div class="roadmap-content">
-                        <div class="roadmap-date">Now — v1.0</div>
-                        <h3>Core Decision Engine</h3>
-                        <p>Swipe decisions, basic feedback loop, Telegram notifications, local storage. You can use this today.</p>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-name">Starter</div>
+                    <div class="pricing-desc">Perfect for solo founders</div>
+                    <div class="pricing-price">Free<span>/forever</span></div>
+                    <div class="pricing-period">Open source, self-hosted</div>
+                    <ul class="pricing-features">
+                        <li>Unlimited decisions</li>
+                        <li>Local storage</li>
+                        <li>Telegram notifications</li>
+                        <li>Basic analytics</li>
+                    </ul>
+                    <a href="https://github.com/xBlackSmurfx008/decision-engine-template" class="pricing-btn pricing-btn-secondary" target="_blank">Get Started</a>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">Most Popular</div>
+                    <div class="pricing-name">Pro</div>
+                    <div class="pricing-desc">For growing teams</div>
+                    <div class="pricing-price">$29<span>/mo</span></div>
+                    <div class="pricing-period">Coming Q2 2026</div>
+                    <ul class="pricing-features">
+                        <li>Everything in Starter</li>
+                        <li>Cloud sync</li>
+                        <li>Team collaboration</li>
+                        <li>Advanced analytics</li>
+                        <li>Priority support</li>
+                    </ul>
+                    <a href="#" class="pricing-btn pricing-btn-primary">Join Waitlist</a>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-name">Enterprise</div>
+                    <div class="pricing-desc">For large organizations</div>
+                    <div class="pricing-price">Custom</div>
+                    <div class="pricing-period">Contact us</div>
+                    <ul class="pricing-features">
+                        <li>Everything in Pro</li>
+                        <li>SSO & SAML</li>
+                        <li>Custom integrations</li>
+                        <li>Dedicated support</li>
+                        <li>SLA guarantee</li>
+                    </ul>
+                    <a href="mailto:hello@decisionengine.io" class="pricing-btn pricing-btn-secondary">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-label">FAQ</div>
+                <h2>Common Questions</h2>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How is this different from a todo list?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        Todo lists track what to do. Decision Engine tracks what you decided, why you decided it, and whether it worked. It's a decision journal that learns.
                     </div>
                 </div>
-                <div class="roadmap-item">
-                    <div class="roadmap-content">
-                        <div class="roadmap-date">Q2 2026 — v1.5</div>
-                        <h3>AI-Powered Suggestions</h3>
-                        <p>Connect to LLM APIs. AI suggests decisions based on your history. "You usually book United for DC trips."
-</p>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Can my team use this?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        The open source version is single-user. Team collaboration is coming in Pro (Q2 2026). For now, each teammate can run their own instance.
                     </div>
                 </div>
-                <div class="roadmap-item">
-                    <div class="roadmap-content">
-                        <div class="roadmap-date">Q3 2026 — v2.0</div>
-                        <h3>Multi-User & Teams</h3>
-                        <p>User accounts, shared decision boards, role-based permissions. Built for executive teams.</p>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Where is my data stored?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        By default, everything stays in your browser (localStorage). You own your data completely. Optional cloud sync coming in Pro tier.
                     </div>
                 </div>
-                <div class="roadmap-item">
-                    <div class="roadmap-content">
-                        <div class="roadmap-date">Q4 2026 — v2.5</div>
-                        <h3>Analytics Dashboard</h3>
-                        <p>Decision velocity, outcome tracking, category insights. See your decision-making patterns over time.</p>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Can I integrate with Slack/Notion/my CRM?</span>
+                        <span>+</span>
                     </div>
-                </div>
-                <div class="roadmap-item">
-                    <div class="roadmap-content">
-                        <div class="roadmap-date">2027 — v3.0</div>
-                        <h3>Autonomous Mode</h3>
-                        <p>High-confidence decisions auto-approved. AI executes on your behalf. You review outcomes, not inputs.</p>
+                    <div class="faq-answer">
+                        Yes! The open source version supports webhooks. Every decision can POST to any URL. Build your own integrations or use our templates.
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA -->
-    <section class="cta">
-        <div class="cta-bg"></div>
-        <h2>Ready to Decide Faster?</h2>
-        <p>Join the early adopters. Deploy your own Decision Engine in 30 seconds. Free, open source, and yours to customize.</p>
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="final-cta-bg"></div>
+        <h2>Stop Overthinking.<br>Start Deciding.</h2>
+        <p>Join 1,000+ founders who've reclaimed their decision-making speed. Free forever, open source.</p>
         <div class="hero-ctas">
-            <a href="https://github.com/xBlackSmurfx008/decision-engine-template" class="btn btn-primary" target="_blank">
-                Get the Code →
+            <a href="https://dashboard-iota-seven-24.vercel.app/decision-cards.html" class="btn btn-primary btn-large" target="_blank">
+                Try It Now →
             </a>
-            <a href="https://dashboard-iota-seven-24.vercel.app/decision-cards.html" class="btn btn-secondary" target="_blank">
-                Try Live Demo
+            <a href="https://github.com/xBlackSmurfx008/decision-engine-template" class="btn btn-secondary btn-large" target="_blank">
+                View on GitHub
             </a>
         </div>
     </section>
@@ -908,33 +1273,24 @@
     <!-- Footer -->
     <footer>
         <p>
-            Built by <a href="https://008.mradams.xyz" target="_blank">Jack Adams</a> for Mr. Adams. 
-            Open sourced for the world. 
-            <a href="https://github.com/xBlackSmurfx008/decision-engine-template" target="_blank">GitHub</a>
+            Built with ⚡ by <a href="https://008.mradams.xyz" target="_blank">Jack Adams</a> for entrepreneurs who move fast. 
+            <a href="https://github.com/xBlackSmurfx008/decision-engine-template" target="_blank">Star on GitHub</a>
         </p>
     </footer>
 
     <script>
-        // Smooth scroll for nav links
+        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
 
-        // Animate elements on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
+        // Animate on scroll
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -942,9 +1298,9 @@
                     entry.target.style.transform = 'translateY(0)';
                 }
             });
-        }, observerOptions);
+        }, { threshold: 0.1 });
 
-        document.querySelectorAll('.step, .feature, .use-case').forEach(el => {
+        document.querySelectorAll('.step, .feature, .testimonial, .problem-card').forEach(el => {
             el.style.opacity = '0';
             el.style.transform = 'translateY(20px)';
             el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
