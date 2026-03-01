@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>008 Task Review | Feedback Loop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #e4e4e7;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        .app {
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0 30px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-value.pending { color: #f59e0b; }
+        .stat-value.completed { color: #22c55e; }
+        .stat-value.stale { color: #ef4444; }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: rgba(255,255,255,0.05);
+            padding: 6px;
+            border-radius: 12px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-card {
+            background: linear-gradient(145deg, #1e1e3a 0%, #252545 100%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .task-card:hover {
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        .task-card.stale {
+            border-left: 3px solid #ef4444;
+        }
+
+        .task-card.completed {
+            border-left: 3px solid #22c55e;
+            opacity: 0.85;
+        }
+
+        .task-card.awaiting-feedback {
+            border-left: 3px solid #f59e0b;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .task-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            flex: 1;
+            margin-right: 12px;
+        }
+
+        .task-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .status-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .status-completed { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .status-stale { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        .task-meta {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .task-meta-item {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .task-meta-item span {
+            color: #9ca3af;
+        }
+
+        .stale-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: rgba(239, 68, 68, 0.2);
+            border-radius: 12px;
+            font-size: 11px;
+            color: #f87171;
+        }
+
+        .task-description {
+            font-size: 14px;
+            color: #9ca3af;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .task-note-original {
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 12px;
+            border-left: 2px solid #4f46e5;
+        }
+
+        .feedback-section {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .feedback-section.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .feedback-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 14px;
+            color: #e4e4e7;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+            margin-bottom: 12px;
+            min-height: 100px;
+        }
+
+        .feedback-input:focus {
+            border-color: #3b82f6;
+        }
+
+        .feedback-options {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .feedback-tag {
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            font-size: 12px;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .feedback-tag:hover, .feedback-tag.selected {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #60a5fa;
+        }
+
+        .feedback-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #9ca3af;
+        }
+
+        .completion-info {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 12px;
+        }
+
+        .completion-info h4 {
+            font-size: 13px;
+            color: #4ade80;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .completion-info p {
+            font-size: 14px;
+            color: #e4e4e7;
+            line-height: 1.5;
+        }
+
+        .completion-tags {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .completion-tag {
+            padding: 4px 10px;
+            background: rgba(34, 197, 94, 0.15);
+            border-radius: 12px;
+            font-size: 11px;
+            color: #4ade80;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 20px 24px;
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            z-index: 100;
+        }
+
+        .nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 11px;
+            transition: color 0.2s;
+        }
+
+        .nav-link.active, .nav-link:hover {
+            color: #fff;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1e1e3a;
+            padding: 14px 28px;
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="header">
+            <h1>🔄 Task Review</h1>
+            <p>Update Jack on completed tasks so he learns</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-value pending" id="statPending">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value stale" id="statStale">0</div>
+                <div class="stat-label">Stale</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value completed" id="statCompleted">0</div>
+                <div class="stat-label">Reviewed</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('pending')">⏳ Pending</button>
+            <button class="tab" onclick="switchTab('completed')">✅ Completed</button>
+            <button class="tab" onclick="switchTab('all')">📋 All</button>
+        </div>
+
+        <div class="task-list" id="taskList"></div>
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon">🎯</div>
+            <h3>No tasks found</h3>
+            <p>Make decisions in the Decision Cards to get started.</p>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <a href="decision-cards.html" class="nav-link">
+            <span class="nav-icon">⚡</span>
+            <span>Decide</span>
+        </a>
+        <a href="task-review.html" class="nav-link active">
+            <span class="nav-icon">🔄</span>
+            <span>Review</span>
+        </a>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Tasks synced from decisions
+        let tasks = [];
+        let currentTab = 'pending';
+        let expandedTask = null;
+
+        function init() {
+            loadTasks();
+            updateStats();
+            renderTasks();
+        }
+
+        function loadTasks() {
+            // Try to load from decisions first
+            const decisions = JSON.parse(localStorage.getItem('008-decisions') || '[]');
+            const existingTasks = JSON.parse(localStorage.getItem('008-tasks-with-feedback') || '[]');
+            
+            // Convert decisions to tasks if not already tracked
+            decisions.forEach(decision => {
+                if (!existingTasks.find(t => t.id === decision.id)) {
+                    existingTasks.push({
+                        id: decision.id,
+                        title: decision.title,
+                        description: decision.description,
+                        category: decision.category,
+                        priority: decision.priority,
+                        decision: decision.decision,
+                        originalNote: decision.note,
+                        decidedAt: decision.timestamp || new Date().toISOString(),
+                        status: 'awaiting-feedback',
+                        completion: null
+                    });
+                }
+            });
+
+            tasks = existingTasks;
+            saveTasks();
+        }
+
+        function saveTasks() {
+            localStorage.setItem('008-tasks-with-feedback', JSON.stringify(tasks));
+        }
+
+        function updateStats() {
+            const pending = tasks.filter(t => t.status === 'awaiting-feedback').length;
+            const stale = tasks.filter(t => t.status === 'stale').length;
+            const completed = tasks.filter(t => t.status === 'completed').length;
+
+            document.getElementById('statPending').textContent = pending;
+            document.getElementById('statStale').textContent = stale;
+            document.getElementById('statCompleted').textContent = completed;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            expandedTask = null;
+            
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            renderTasks();
+        }
+
+        function getFilteredTasks() {
+            const now = Date.now();
+            
+            // Auto-mark stale (> 3 days)
+            tasks.forEach(task => {
+                if (task.status === 'awaiting-feedback') {
+                    const decidedAt = new Date(task.decidedAt).getTime();
+                    const daysSince = (now - decidedAt) / (1000 * 60 * 60 * 24);
+                    if (daysSince > 3) {
+                        task.status = 'stale';
+                    }
+                }
+            });
+
+            if (currentTab === 'pending') {
+                return tasks.filter(t => t.status === 'awaiting-feedback' || t.status === 'stale');
+            } else if (currentTab === 'completed') {
+                return tasks.filter(t => t.status === 'completed');
+            }
+            return tasks;
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('taskList');
+            const emptyState = document.getElementById('emptyState');
+            const filtered = getFilteredTasks();
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            
+            container.innerHTML = filtered.map(task => {
+                const isExpanded = expandedTask === task.id;
+                const daysSince = Math.floor((Date.now() - new Date(task.decidedAt).getTime()) / (1000 * 60 * 60 * 24));
+                
+                if (task.status === 'completed' && task.completion) {
+                    return renderCompletedTask(task, daysSince);
+                }
+                
+                return renderPendingTask(task, isExpanded, daysSince);
+            }).join('');
+        }
+
+        function renderCompletedTask(task, daysSince) {
+            return `
+                <div class="task-card completed">
+                    <div class="task-header">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-status status-completed">✓ Done</div>
+                    </div>
+                    <div class="task-meta">
+                        <div class="task-meta-item">Category: <span>${task.category}</span></div>
+                        <div class="task-meta-item">Decision: <span style="color: ${task.decision === 'approve' ? '#4ade80' : '#f87171'}">${task.decision === 'approve' ? '✓ Approved' : '✕ Rejected'}</span></div>
+                    </div>
+                    <div class="completion-info">
+                        <h4>✅ Your Feedback</h4>
+                        <p>${task.completion.feedback}</p>
+                        ${task.completion.tags?.length ? `
+                        <div class="completion-tags">
+                            ${task.completion.tags.map(tag => `<span class="completion-tag">${tag}</span>`).join('')}
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPendingTask(task, isExpanded, daysSince) {
+            const isStale = task.status === 'stale';
+            
+            return `
+                <div class="task-card ${task.status}" onclick="toggleExpand('${task.id}')">
+                    <div class="task-header">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-status ${isStale ? 'status-stale' : 'status-pending'}">
+                            ${isStale ? '⚠️ Stale' : '⏳ Pending'}
+                        </div>
+                    </div>
+                    <div class="task-meta">
+                        <div class="task-meta-item">Category: <span>${task.category}</span></div>
+                        <div class="task-meta-item">Decision: <span style="color: ${task.decision === 'approve' ? '#4ade80' : '#f87171'}">${task.decision === 'approve' ? '✓ Approved' : '✕ Rejected'}</span></div>
+                        ${isStale ? `<div class="task-meta-item"><span class="stale-badge">⚠️ ${daysSince} days old</span></div>` : ''}
+                    </div>
+                    <div class="task-description">${task.description}</div>
+                    
+                    ${task.originalNote ? `
+                    <div class="task-note-original">
+                        <strong>📝 Original Note:</strong><br>
+                        ${task.originalNote}
+                    </div>
+                    ` : ''}
+                    
+                    <div class="feedback-section ${isExpanded ? 'active' : ''}" onclick="event.stopPropagation()">
+                        <div class="feedback-title">How did this go? Teach Jack.</div>
+                        <textarea class="feedback-input" id="feedback-${task.id}" placeholder="Describe what happened... Did you do it differently? Any lessons learned?"></textarea>
+                        
+                        <div class="feedback-options" id="tags-${task.id}">
+                            <div class="feedback-tag" onclick="toggleTag(this)">✅ Completed as planned</div>
+                            <div class="feedback-tag" onclick="toggleTag(this)">🔄 Did it differently</div>
+                            <div class="feedback-tag" onclick="toggleTag(this)">⬆️ Exceeded expectations</div>
+                            <div class="feedback-tag" onclick="toggleTag(this)">⬇️ Didn't work out</div>
+                            <div class="feedback-tag" onclick="toggleTag(this)">💡 Better approach found</div>
+                            <div class="feedback-tag" onclick="toggleTag(this)">⏰ Took longer</div>
+                            <div class="feedback-tag" onclick="toggleTag(this)">💰 Saved money</div>
+                        </div>
+                        
+                        <div class="feedback-actions">
+                            <button class="btn btn-secondary" onclick="cancelFeedback('${task.id}')">Cancel</button>
+                            <button class="btn btn-primary" onclick="submitFeedback('${task.id}')">Submit Feedback</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleExpand(taskId) {
+            expandedTask = expandedTask === taskId ? null : taskId;
+            renderTasks();
+        }
+
+        function toggleTag(element) {
+            element.classList.toggle('selected');
+        }
+
+        function cancelFeedback(taskId) {
+            expandedTask = null;
+            renderTasks();
+        }
+
+        async function submitFeedback(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            const feedbackText = document.getElementById(`feedback-${taskId}`)?.value.trim();
+            if (!feedbackText) {
+                showToast('Please describe how it went');
+                return;
+            }
+
+            // Get selected tags
+            const tagContainer = document.getElementById(`tags-${taskId}`);
+            const selectedTags = Array.from(tagContainer?.querySelectorAll('.feedback-tag.selected') || [])
+                .map(el => el.textContent.trim());
+
+            // Determine outcome
+            let outcome = 'success';
+            if (selectedTags.some(t => t.includes("Didn't work out"))) outcome = 'failed';
+            else if (selectedTags.some(t => t.includes('differently') || t.includes('Better approach'))) outcome = 'different-approach';
+            else if (selectedTags.some(t => t.includes('Exceeded'))) outcome = 'exceeded';
+
+            // Update task
+            task.status = 'completed';
+            task.completion = {
+                completedAt: new Date().toISOString(),
+                feedback: feedbackText,
+                outcome: outcome,
+                tags: selectedTags
+            };
+
+            saveTasks();
+            await sendFeedbackToJack(task);
+
+            expandedTask = null;
+            updateStats();
+            renderTasks();
+            showToast('✅ Feedback saved! Jack will learn from this.');
+        }
+
+        async function sendFeedbackToJack(task) {
+            const payload = {
+                type: 'task_feedback',
+                taskId: task.id,
+                title: task.title,
+                category: task.category,
+                originalDecision: task.decision,
+                originalNote: task.originalNote,
+                completion: task.completion,
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch('/api/task-feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    console.log('✓ Feedback sent to Jack:', task.id);
+                }
+            } catch (e) {
+                const queue = JSON.parse(localStorage.getItem('008-feedback-queue') || '[]');
+                queue.push(payload);
+                localStorage.setItem('008-feedback-queue', JSON.stringify(queue));
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>008 Decision Cards | Swipe to Decide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #e4e4e7;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .app {
+            max-width: 480px;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 10px 0 20px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            height: 4px;
+            border-radius: 2px;
+            margin: 15px 0 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* Card Container */
+        .card-stage {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        /* The Decision Card */
+        .decision-card {
+            position: absolute;
+            width: 100%;
+            max-width: 400px;
+            background: linear-gradient(145deg, #1e1e3a 0%, #252545 100%);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0,0,0,0.5),
+                0 0 0 1px rgba(255,255,255,0.1),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.1s, box-shadow 0.2s;
+            border: 1px solid rgba(255,255,255,0.08);
+            transform-style: preserve-3d;
+        }
+
+        .decision-card:active {
+            cursor: grabbing;
+        }
+
+        .decision-card.animating {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+        }
+
+        .decision-card.swiped-left {
+            transform: translateX(-120%) rotate(-20deg) !important;
+            opacity: 0;
+        }
+
+        .decision-card.swiped-right {
+            transform: translateX(120%) rotate(20deg) !important;
+            opacity: 0;
+        }
+
+        /* Category Badge */
+        .card-category {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .card-category.urgent { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .card-category.business { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .card-category.personal { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+        .card-category.travel { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+        /* Card Content */
+        .card-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.2;
+            color: #ffffff;
+        }
+
+        .card-description {
+            color: #9ca3af;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 12px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .meta-label {
+            font-size: 10px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            color: #e4e4e7;
+            font-weight: 500;
+        }
+
+        /* Note Input */
+        .note-section {
+            margin-bottom: 20px;
+        }
+
+        .note-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .note-input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 14px;
+            color: #e4e4e7;
+            font-size: 15px;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .note-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .note-input::placeholder {
+            color: #4b5563;
+        }
+
+        /* Swipe Indicators */
+        .swipe-indicator {
+            position: absolute;
+            top: 40px;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.2s, transform 0.2s;
+            border: 3px solid;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .indicator-reject {
+            left: 20px;
+            color: #ef4444;
+            border-color: #ef4444;
+            transform: rotate(-15deg);
+        }
+
+        .indicator-approve {
+            right: 20px;
+            color: #22c55e;
+            border-color: #22c55e;
+            transform: rotate(15deg);
+        }
+
+        .decision-card.show-reject .indicator-reject,
+        .decision-card.show-approve .indicator-approve {
+            opacity: 1;
+            transform: scale(1) rotate(var(--rotation, 0deg));
+        }
+
+        /* Card Counter */
+        .card-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px 0 10px;
+        }
+
+        .action-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid;
+            background: transparent;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-reject {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .btn-reject:hover {
+            background: #ef4444;
+            color: white;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-approve {
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        .btn-approve:hover {
+            background: #22c55e;
+            color: white;
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
+        }
+
+        /* Keyboard Hint */
+        .keyboard-hint {
+            text-align: center;
+            font-size: 11px;
+            color: #4b5563;
+            padding-bottom: 10px;
+        }
+
+        .keyboard-hint kbd {
+            background: rgba(255,255,255,0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin: 0 3px;
+            font-family: inherit;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1e1e3a;
+            padding: 14px 28px;
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.approved {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+            color: #4ade80;
+        }
+
+        .toast.rejected {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #f87171;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            display: none;
+        }
+
+        .empty-state.show {
+            display: block;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        /* Decision Log */
+        .decision-log {
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 10px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .log-header {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .log-entry {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-decision {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .log-decision.approved {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .log-decision.rejected {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .log-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .log-title {
+            color: #e4e4e7;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-note {
+            color: #6b7280;
+            font-size: 11px;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-time {
+            color: #4b5563;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        /* Background decorative elements */
+        .bg-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .glow-1 {
+            width: 400px;
+            height: 400px;
+            background: #4f46e5;
+            top: -100px;
+            right: -100px;
+        }
+
+        .glow-2 {
+            width: 300px;
+            height: 300px;
+            background: #06b6d4;
+            bottom: -50px;
+            left: -50px;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 20px 24px;
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            z-index: 100;
+        }
+
+        .nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 11px;
+            transition: color 0.2s;
+        }
+
+        .nav-link.active, .nav-link:hover {
+            color: #fff;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <div class="app">
+        <!-- Header -->
+        <div class="header">
+            <h1>⚡ 008 Decision Engine</h1>
+            <p>Swipe to decide. Notes capture context.</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-text" id="progressText">0 / 0 decisions</div>
+        </div>
+
+        <!-- Card Stage -->
+        <div class="card-stage" id="cardStage">
+            <!-- Cards injected here -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-icon">🎯</div>
+            <h2>All Caught Up!</h2>
+            <p>Decisions have been sent to Jack for execution.</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="actions" id="actionButtons">
+            <button class="action-btn btn-reject" onclick="makeDecision('reject')" title="Reject (Left Arrow)">✕</button>
+            <button class="action-btn btn-approve" onclick="makeDecision('approve')" title="Approve (Right Arrow)">✓</button>
+        </div>
+
+        <div class="keyboard-hint" id="keyboardHint">
+            <kbd>←</kbd> Reject <kbd>→</kbd> Approve
+        </div>
+
+        <!-- Decision Log -->
+        <div class="decision-log">
+            <div class="log-header">
+                <span>📡 Decisions sent to Jack</span>
+                <div class="log-status">
+                    <span class="status-dot"></span>
+                    <span>Live</span>
+                </div>
+            </div>
+            <div id="decisionLog"></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Sample Decision Cards
+        const DECISION_CARDS = [
+            {
+                id: 'dc-001',
+                title: 'Book DC Trip Flights',
+                description: 'Book round-trip flights from CMH to DCA for March 1-7. Current prices: $280-340 on Southwest/American.',
+                category: 'travel',
+                priority: 'urgent',
+                dueDate: 'March 1, 2026',
+                estimatedCost: '$300-350',
+                context: 'Trip is 3 days out, no flights booked yet'
+            },
+            {
+                id: 'dc-002',
+                title: 'Book DC Hotel',
+                description: 'Reserve 6 nights hotel in DC (March 1-7). Prefer downtown near convention center.',
+                category: 'travel',
+                priority: 'urgent',
+                dueDate: 'March 1, 2026',
+                estimatedCost: '$180/night',
+                context: 'Block of rooms held until Feb 28'
+            },
+            {
+                id: 'dc-003',
+                title: 'Hire Virtual Assistant',
+                description: 'Find, interview, and onboard a VA for 20hrs/week. Tasks: email management, scheduling, research.',
+                category: 'business',
+                priority: 'high',
+                dueDate: 'March 15, 2026',
+                estimatedCost: '$800-1200/month',
+                context: '3 candidates in pipeline from Belay'
+            },
+            {
+                id: 'dc-004',
+                title: 'Launch Weekly Podcast',
+                description: 'Start "The DigiWealth Show" - 30min weekly episodes on crypto wealth building.',
+                category: 'business',
+                priority: 'medium',
+                dueDate: 'April 1, 2026',
+                estimatedCost: '$500 setup + $200/month',
+                context: 'Mic and software ready. Need intro/outro music.'
+            },
+            {
+                id: 'dc-005',
+                title: 'Schedule Q1 Tax Review',
+                description: 'Meet with CPA to review Q1 2026 finances, estimated taxes, and entity structure.',
+                category: 'business',
+                priority: 'high',
+                dueDate: 'March 31, 2026',
+                estimatedCost: '$400',
+                context: 'New 1099 income streams need tracking setup'
+            },
+            {
+                id: 'dc-006',
+                title: 'Upgrade Home Office Setup',
+                description: 'Second monitor, standing desk converter, and better lighting for video calls.',
+                category: 'personal',
+                priority: 'low',
+                dueDate: 'Anytime',
+                estimatedCost: '$600-800',
+                context: 'Current setup causing neck strain'
+            },
+            {
+                id: 'dc-007',
+                title: 'Join EO Columbus',
+                description: 'Apply to Entrepreneurs Organization Columbus chapter. Mastermind group for business owners.',
+                category: 'business',
+                priority: 'medium',
+                dueDate: 'March 15, 2026',
+                estimatedCost: '$3,500/year',
+                context: 'Sponsor referral from current member'
+            },
+            {
+                id: 'dc-008',
+                title: 'Renew Pillar CMO Contract',
+                description: '2-year contract renewal at $12K/month. Negotiate equity component.',
+                category: 'business',
+                priority: 'urgent',
+                dueDate: 'March 1, 2026',
+                estimatedCost: 'N/A - Income',
+                context: 'Current contract expires March 1'
+            },
+            {
+                id: 'dc-009',
+                title: 'Plan Family Spring Break',
+                description: 'Book trip for April 5-12. Options: Florida beach, Smoky Mountains, or Chicago.',
+                category: 'personal',
+                priority: 'medium',
+                dueDate: 'March 10, 2026',
+                estimatedCost: '$2,500-4,000',
+                context: 'Kids off school April 5-12'
+            },
+            {
+                id: 'dc-010',
+                title: 'Launch 008 Newsletter',
+                description: 'Weekly newsletter on AI, crypto, and wealth. Use Beehiiv or Substack.',
+                category: 'business',
+                priority: 'low',
+                dueDate: 'April 2026',
+                estimatedCost: '$0-100/month',
+                context: 'Build audience ahead of podcast launch'
+            }
+        ];
+
+        // State
+        let pendingDecisions = [...DECISION_CARDS];
+        let completedDecisions = [];
+        let currentCardIndex = 0;
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let currentX = 0, currentY = 0;
+
+        // DOM Elements
+        const cardStage = document.getElementById('cardStage');
+        const emptyState = document.getElementById('emptyState');
+        const actionButtons = document.getElementById('actionButtons');
+        const keyboardHint = document.getElementById('keyboardHint');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const decisionLog = document.getElementById('decisionLog');
+        const toast = document.getElementById('toast');
+
+        // Initialize
+        function init() {
+            renderCard();
+            updateProgress();
+            setupKeyboard();
+            loadSavedDecisions();
+        }
+
+        // Render current card
+        function renderCard() {
+            cardStage.innerHTML = '';
+
+            if (pendingDecisions.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            const card = pendingDecisions[0];
+            const cardEl = document.createElement('div');
+            cardEl.className = 'decision-card';
+            cardEl.id = 'currentCard';
+            cardEl.innerHTML = `
+                <span class="card-counter">${completedDecisions.length + 1} / ${DECISION_CARDS.length}</span>
+                <span class="card-category ${card.category} ${card.priority === 'urgent' ? 'urgent' : ''}">${card.category}</span>
+                
+                <div class="swipe-indicator indicator-reject">REJECT</div>
+                <div class="swipe-indicator indicator-approve">APPROVE</div>
+                
+                <h2 class="card-title">${card.title}</h2>
+                <p class="card-description">${card.description}</p>
+                
+                <div class="card-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Due Date</span>
+                        <span class="meta-value">${card.dueDate}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Est. Cost</span>
+                        <span class="meta-value">${card.estimatedCost}</span>
+                    </div>
+                    ${card.priority === 'urgent' ? `
+                    <div class="meta-item">
+                        <span class="meta-label">Priority</span>
+                        <span class="meta-value" style="color: #f87171">URGENT</span>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <div class="note-section">
+                    <label class="note-label">📝 Add context or instructions for Jack</label>
+                    <textarea 
+                        class="note-input" 
+                        id="noteInput" 
+                        rows="3" 
+                        placeholder="e.g., Book the earliest flight, prefer Southwest, use points if available..."
+                    ></textarea>
+                </div>
+            `;
+
+            cardStage.appendChild(cardEl);
+            setupDrag(cardEl);
+        }
+
+        // Setup drag/swipe handlers
+        function setupDrag(card) {
+            // Touch/Mouse events
+            card.addEventListener('pointerdown', handlePointerDown);
+            card.addEventListener('pointermove', handlePointerMove);
+            card.addEventListener('pointerup', handlePointerUp);
+            card.addEventListener('pointercancel', handlePointerUp);
+        }
+
+        function handlePointerDown(e) {
+            if (e.target.tagName === 'TEXTAREA') return;
+            
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            const card = document.getElementById('currentCard');
+            card.setPointerCapture(e.pointerId);
+            card.classList.remove('animating');
+        }
+
+        function handlePointerMove(e) {
+            if (!isDragging) return;
+            
+            currentX = e.clientX - startX;
+            currentY = e.clientY - startY;
+            
+            const card = document.getElementById('currentCard');
+            const rotate = currentX * 0.05;
+            card.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotate}deg)`;
+
+            // Show indicators
+            card.classList.remove('show-reject', 'show-approve');
+            if (currentX < -50) {
+                card.classList.add('show-reject');
+            } else if (currentX > 50) {
+                card.classList.add('show-approve');
+            }
+        }
+
+        function handlePointerUp(e) {
+            if (!isDragging) return;
+            isDragging = false;
+
+            const card = document.getElementById('currentCard');
+            
+            if (currentX < -100) {
+                makeDecision('reject');
+            } else if (currentX > 100) {
+                makeDecision('approve');
+            } else {
+                // Snap back
+                card.classList.add('animating');
+                card.style.transform = '';
+                card.classList.remove('show-reject', 'show-approve');
+            }
+            
+            currentX = 0;
+            currentY = 0;
+        }
+
+        // Make a decision
+        function makeDecision(decision) {
+            const card = document.getElementById('currentCard');
+            if (!card) return;
+
+            const currentDecision = pendingDecisions[0];
+            const note = document.getElementById('noteInput')?.value?.trim() || '';
+
+            // Animate out
+            card.classList.add('animating');
+            card.classList.add(decision === 'reject' ? 'swiped-left' : 'swiped-right');
+
+            // Record decision
+            const decisionRecord = {
+                ...currentDecision,
+                decision: decision,
+                note: note,
+                timestamp: new Date().toISOString(),
+                decidedBy: 'Mr.Adams'
+            };
+
+            completedDecisions.push(decisionRecord);
+            pendingDecisions.shift();
+
+            // Save and sync
+            saveDecision(decisionRecord);
+            addToLog(decisionRecord);
+
+            // Show toast
+            showToast(
+                decision === 'approve' ? '✓ Sent to Jack for execution' : '✕ Archived',
+                decision
+            );
+
+            // Next card
+            setTimeout(() => {
+                renderCard();
+                updateProgress();
+            }, 350);
+        }
+
+        // Save decision to storage and send to Jack
+        function saveDecision(decision) {
+            // Local storage
+            const saved = JSON.parse(localStorage.getItem('008-decisions') || '[]');
+            saved.push(decision);
+            localStorage.setItem('008-decisions', JSON.stringify(saved));
+
+            // Send to Jack (API call)
+            sendToJack(decision);
+        }
+
+        // Send decision to Jack's API
+        async function sendToJack(decision) {
+            const ENDPOINT = '/api/decisions';
+            
+            try {
+                const response = await fetch(ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(decision)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✓ Decision synced to Jack:', decision.id, result);
+                    return result;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (e) {
+                console.warn('API unavailable, queuing for later:', e.message);
+                queueForSync(decision);
+            }
+        }
+
+        // Queue for later sync
+        function queueForSync(decision) {
+            const queue = JSON.parse(localStorage.getItem('008-decision-queue') || '[]');
+            queue.push(decision);
+            localStorage.setItem('008-decision-queue', JSON.stringify(queue));
+        }
+
+        // Add to visual log
+        function addToLog(decision) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <div class="log-decision ${decision.decision}">
+                    ${decision.decision === 'approve' ? '✓' : '✕'}
+                </div>
+                <div class="log-info">
+                    <div class="log-title">${decision.title}</div>
+                    ${decision.note ? `<div class="log-note">"${decision.note.substring(0, 40)}${decision.note.length > 40 ? '...' : ''}"</div>` : ''}
+                </div>
+                <div class="log-time">Just now</div>
+            `;
+
+            decisionLog.insertBefore(entry, decisionLog.firstChild);
+
+            // Keep only last 10
+            while (decisionLog.children.length > 10) {
+                decisionLog.removeChild(decisionLog.lastChild);
+            }
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            cardStage.style.display = 'none';
+            actionButtons.style.display = 'none';
+            keyboardHint.style.display = 'none';
+            emptyState.classList.add('show');
+        }
+
+        // Update progress
+        function updateProgress() {
+            const total = DECISION_CARDS.length;
+            const done = completedDecisions.length;
+            const pct = (done / total) * 100;
+            
+            progressFill.style.width = `${pct}%`;
+            progressText.textContent = `${done} / ${total} decisions`;
+        }
+
+        // Keyboard shortcuts
+        function setupKeyboard() {
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'TEXTAREA') {
+                    // Allow textarea navigation
+                    if (e.key === 'Escape') {
+                        e.target.blur();
+                    }
+                    return;
+                }
+
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    makeDecision('reject');
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    makeDecision('approve');
+                }
+            });
+        }
+
+        // Show toast
+        function showToast(message, type) {
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Load saved decisions
+        function loadSavedDecisions() {
+            const saved = JSON.parse(localStorage.getItem('008-decisions') || '[]');
+            
+            // Show last 5 in log
+            saved.slice(-5).reverse().forEach(d => addToLog(d));
+        }
+
+        // Start
+        init();
+    </script>
+
+    <!-- Bottom Navigation -->
+    <div class="nav-bar">
+        <a href="decision-cards.html" class="nav-link active">
+            <span class="nav-icon">⚡</span>
+            <span>Decide</span>
+        </a>
+        <a href="task-review.html" class="nav-link">
+            <span class="nav-icon">🔄</span>
+            <span>Review</span>
+        </a>
+    </div>
+</body>
+</html>

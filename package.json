@@ -1,0 +1,8 @@
+{
+  "name": "008-dashboard",
+  "version": "1.0.0",
+  "description": "008 Assistant Dashboard with Decision Cards",
+  "dependencies": {
+    "@vercel/kv": "^1.0.0"
+  }
+}
