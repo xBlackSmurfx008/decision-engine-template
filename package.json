@@ -1,8 +1,6 @@
 {
-  "name": "008-dashboard",
+  "name": "decision-engine",
   "version": "1.0.0",
-  "description": "008 Assistant Dashboard with Decision Cards",
-  "dependencies": {
-    "@vercel/kv": "^1.0.0"
-  }
+  "description": "Tinder-style decision making system with feedback loop",
+  "private": true
 }

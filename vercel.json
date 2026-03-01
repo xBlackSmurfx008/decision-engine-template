@@ -1,15 +1,14 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
+  "framework": null,
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "source": "/api/decisions",
+      "destination": "/api/decisions.js"
+    },
+    {
+      "source": "/api/task-feedback",
+      "destination": "/api/task-feedback.js"
     }
   ],
   "headers": [
